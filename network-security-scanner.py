@@ -53,44 +53,7 @@ def os_detection(target):
     else:
         print(f"{Fore.YELLOW}[!] OS detection failed{Style.RESET_ALL}")
 
-def check_ssl(target, port=443):
-    print(f"{Fore.BLUE}[*] Checking SSL/TLS configuration for {target}:{port}{Style.RESET_ALL}")
-    try:
-        context = ssl.create_default_context()
-        with socket.create_connection((target, port)) as sock:
-            with context.wrap_socket(sock, server_hostname=target) as secure_sock:
-                cert = secure_sock.getpeercert()
-                print(f"{Fore.GREEN}[+] SSL/TLS connection established{Style.RESET_ALL}")
-                print(f"    Version: {secure_sock.version()}")
-                print(f"    Cipher: {secure_sock.cipher()[0]}")
-                print(f"    Expires: {cert['notAfter']}")
-    except ssl.SSLError as e:
-        print(f"{Fore.RED}[-] SSL/TLS error: {e}{Style.RESET_ALL}")
-    except Exception as e:
-        print(f"{Fore.RED}[-] Error checking SSL/TLS: {e}{Style.RESET_ALL}")
 
-def check_http_security_headers(target):
-    print(f"{Fore.BLUE}[*] Checking HTTP security headers for {target}{Style.RESET_ALL}")
-    try:
-        response = requests.get(f"https://{target}", timeout=5)
-        headers = response.headers
-        security_headers = {
-            'Strict-Transport-Security': 'HSTS',
-            'X-Frame-Options': 'X-Frame-Options',
-            'X-XSS-Protection': 'XSS Protection',
-            'X-Content-Type-Options': 'X-Content-Type-Options',
-            'Referrer-Policy': 'Referrer Policy',
-            'Content-Security-Policy': 'CSP'
-        }
-        
-        print(f"{Fore.GREEN}[+] Security Headers:{Style.RESET_ALL}")
-        for header, description in security_headers.items():
-            if header in headers:
-                print(f"    {description}: {headers[header]}")
-            else:
-                print(f"{Fore.YELLOW}    {description}: Not set{Style.RESET_ALL}")
-    except requests.RequestException as e:
-        print(f"{Fore.RED}[-] Error checking HTTP headers: {e}{Style.RESET_ALL}")
 
 def main():
     parser = argparse.ArgumentParser(description="Network Security Scanner")
